@@ -7,7 +7,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-BOT_TOKEN = os.environ["BOT_TOKEN"]  # збережено в Environment Variables
+# --- Bot Token and Webhook ---
+BOT_TOKEN = os.environ["BOT_TOKEN"]
 WEBHOOK_PATH = f"/webhook/{BOT_TOKEN}"
 WEBHOOK_URL = f"https://{os.environ['RENDER_EXTERNAL_HOSTNAME']}{WEBHOOK_PATH}"
 
@@ -66,7 +67,7 @@ async def default_echo(message: types.Message, state: FSMContext):
         await state.clear()
         await message.answer("Розрахунок скасовано.")
 
-# --- Callbacks and FSM flows ---
+# --- Callback and FSM flows ---
 @dp.callback_query(lambda c: c.data == "start_calc_cornices")
 async def start_calc(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer("Введи довжину карнизу (метри). Приклад: 3 або 3.0")
@@ -170,7 +171,7 @@ async def got_tape_metraj(message: types.Message, state: FSMContext):
 async def webhook(request: Request):
     data = await request.json()
     update = Update(**data)
-    await dp.feed_update(update)
+    await dp.process_update(update)  # <- ОНОВЛЕНО
     return {"ok": True}
 
 # --- Startup / Shutdown events ---
